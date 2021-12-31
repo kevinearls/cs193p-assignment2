@@ -10,15 +10,20 @@ import SwiftUI
 
 struct MemoryGame<CardContent> where CardContent: Equatable {
     private(set) var cards: Array<Card>
-    private var indexOfTheOneAndOnlyFaceUpCard: Int?
+    
+    private var indexOfTheOneAndOnlyFaceUpCard: Int? {
+        get { cards.indices.filter({ cards[$0].isFaceUp}).oneAndOnly }
+        set { cards.indices.forEach({ cards[$0].isFaceUp = ($0 == newValue) })}
+    }
+    
     private var score = 0
     
     let vehicleEmojis =  ["✈️",  "🚃", "🚅", "🚁", "🚕", "🚗", "🚙", "🚌", "🚎", "🏎", "🚢", "🚓", "🚑", "🚒", "🚐", "🛻", "🚚", "🦽", "🦼", "🛴", "🚲", "🛵", "🏍"]
     let fruitEmojis = ["🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈", "🍒", "🍑", "🥭", "🍍", "🥥", "🥝", "🍅", "🍆", "🥑"]
     let animalEmojis = ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐻‍❄️", "🐨", "🐯", "🦁", "🐮", "🐷", "🐽", "🐸", "🐵", "🙈", "🙉", "🙊", "🐒", "🐔", "🐧", "🐦"]
     let sportsEmojis = [ "🏈", "⚽️", "🏀", "🏋🏻" ]
-    var chosenTheme: Theme?
-    var themes: [String: Theme] = [:]
+    private var chosenTheme: Theme?
+    private var themes: [String: Theme] = [:]
     
     mutating func choose(_ card: Card) {
         if let chosenIndex = cards.firstIndex(where: { $0.id == card.id}), !cards[chosenIndex].isFaceUp, !cards[chosenIndex].isMatched {
@@ -36,19 +41,18 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
                         score -= 1
                     }
                 }
-                indexOfTheOneAndOnlyFaceUpCard = nil
+                cards[chosenIndex].isFaceUp = true
             } else {
                 // Only one card here...
-                print("only one")
                 for index in cards.indices {
                     if cards[index].isFaceUp && !cards[index].isMatched {
                         cards[index].hasBeenSeen = true
                     }
-                    cards[index].isFaceUp = false  
+                    //cards[index].isFaceUp = false
                 }
                 indexOfTheOneAndOnlyFaceUpCard = chosenIndex
             }
-            cards[chosenIndex].isFaceUp.toggle()
+            // cards[chosenIndex].isFaceUp.toggle()
         }
     }
     
@@ -65,7 +69,7 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
     }
     
     init() {
-        cards = Array<Card>()
+        cards = []
         
         let animals = Theme(name: "animals", color:Color.red, numberOfPairsOfCards: 4, emoji: animalEmojis)
         let fruits = Theme(name: "fruits", color:Color.blue, numberOfPairsOfCards: 6, emoji: fruitEmojis)
@@ -93,17 +97,27 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
     }
     
     struct Card: Identifiable {
-        var isFaceUp: Bool = false
-        var isMatched: Bool = false
+        var isFaceUp = false
+        var isMatched = false
         var hasBeenSeen = false
-        var content: CardContent
-        var id: Int
+        let content: CardContent
+        let id: Int
     }
     
-    struct Theme {
+    private struct Theme {
         var name: String
         var color: Color
         var numberOfPairsOfCards: Int
         var emoji: [String]
+    }
+}
+
+extension Array {
+    var oneAndOnly: Element? {
+        if self.count == 1 {
+            return self.first
+        } else {
+            return nil
+        }
     }
 }
