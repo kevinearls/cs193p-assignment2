@@ -13,19 +13,16 @@ struct EmojiMemoryGameView: View {
     var body: some View {
         VStack {
             Text(game.getTheme()).font(.largeTitle)
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 75))]) {
-                    ForEach(game.cards) { card in
-                        CardView(card: card)
-                            .aspectRatio(2/3, contentMode: .fit)
-                            .onTapGesture {
-                                game.choose(card)
-                            }
-                    }
+            AspectVGrid(items: game.cards, aspectRatio: 2/3) { card in
+                if card.isMatched  && !card.isFaceUp {
+                    Rectangle().opacity(0.1)
+                } else {
+                    CardView(card: card)
+                        .padding(4)
+                        .onTapGesture { game.choose(card) }
                 }
             }
             .foregroundColor(game.getColor())
-            .font(.largeTitle)
             .padding(.horizontal)
             Text("Score: \(game.getScore())").font(.largeTitle)
             Button("New Game", action: game.startNewGame ).buttonStyle(.bordered)
@@ -67,9 +64,9 @@ struct ContentView_Previews: PreviewProvider {
 }
 
 private struct DrawingConstants {
-    static let cornerRadius:CGFloat = 20.0
+    static let cornerRadius:CGFloat = 10.0
     static let lineWidth:CGFloat = 3.0
-    static let fontScale:CGFloat = 0.8
+    static let fontScale:CGFloat = 0.75
 }
 
 
