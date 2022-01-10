@@ -4,6 +4,7 @@
 //
 //  Created by Kevin Earls on 21/12/2021.
 //
+// This is the model
 
 import Foundation
 import SwiftUI
