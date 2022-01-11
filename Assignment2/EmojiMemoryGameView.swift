@@ -15,7 +15,7 @@ struct EmojiMemoryGameView: View {
             Text(game.getTheme()).font(.largeTitle)
             AspectVGrid(items: game.cards, aspectRatio: 2/3) { card in
                 if card.isMatched  && !card.isFaceUp {
-                    Rectangle().opacity(0.1)
+                    Rectangle().opacity(DrawingConstants.matchedCardOpacity)
                 } else {
                     CardView(card: card)
                         .padding(4)
@@ -38,22 +38,15 @@ struct CardView: View {
     }
     
     var body: some View {
-        let shape=RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
+
         GeometryReader { geometry in
             ZStack {
-                if card.isFaceUp {
-                    shape.fill().foregroundColor(.white)
-                    shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
-                    // NOTE: we're no using normal Cartesian coordinates here...
-                    Pie(startAngle: Angle(degrees: 0-90), endAngle: Angle(degrees: 110-90), clockwise: true)
-                        .padding(5).opacity(0.5)
-                    Text(card.content).font(font(in: geometry.size))
-                } else if card.isMatched {
-                    shape.opacity(0.1)
-                } else {
-                    shape.fill()
-                }
-            }
+                // NOTE: we're no using normal Cartesian coordinates here...
+                Pie(startAngle: Angle(degrees: 0-90), endAngle: Angle(degrees: 110-90), clockwise: true)
+                    .padding(5).opacity(0.5)
+                Text(card.content).font(font(in: geometry.size))
+               
+            }.cardify(isFaceUp: card.isFaceUp)
         }
     }
 }
@@ -68,9 +61,8 @@ struct ContentView_Previews: PreviewProvider {
 }
 
 private struct DrawingConstants {
-    static let cornerRadius:CGFloat = 10.0
-    static let lineWidth:CGFloat = 3.0
     static let fontScale:CGFloat = 0.70
+    static let matchedCardOpacity:CGFloat = 0.05
 }
 
 

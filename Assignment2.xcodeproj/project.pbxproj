@@ -15,6 +15,7 @@
 		96A88A35277238DD006FC14D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96A88A34277238DD006FC14D /* Preview Assets.xcassets */; };
 		96A88A3C27723B1F006FC14D /* MemoryGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A88A3B27723B1F006FC14D /* MemoryGame.swift */; };
 		96A88A3E27723CB0006FC14D /* EmojiMemoryGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A88A3D27723CAF006FC14D /* EmojiMemoryGame.swift */; };
+		96F8AF58278C9DA10020887C /* Cardify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F8AF57278C9DA10020887C /* Cardify.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		96A88A34277238DD006FC14D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		96A88A3B27723B1F006FC14D /* MemoryGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryGame.swift; sourceTree = "<group>"; };
 		96A88A3D27723CAF006FC14D /* EmojiMemoryGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiMemoryGame.swift; sourceTree = "<group>"; };
+		96F8AF57278C9DA10020887C /* Cardify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cardify.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 				96A88A2F277238DB006FC14D /* EmojiMemoryGameView.swift */,
 				96226495278360E500EA54C5 /* AspectVGrid.swift */,
 				96A88A3B27723B1F006FC14D /* MemoryGame.swift */,
+				96F8AF57278C9DA10020887C /* Cardify.swift */,
 				96A88A3D27723CAF006FC14D /* EmojiMemoryGame.swift */,
 				96A88A31277238DD006FC14D /* Assets.xcassets */,
 				96A88A33277238DD006FC14D /* Preview Content */,
@@ -150,6 +153,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				962264982784C73800EA54C5 /* Pie.swift in Sources */,
+				96F8AF58278C9DA10020887C /* Cardify.swift in Sources */,
 				96A88A3C27723B1F006FC14D /* MemoryGame.swift in Sources */,
 				96A88A30277238DB006FC14D /* EmojiMemoryGameView.swift in Sources */,
 				96A88A2E277238DB006FC14D /* Assignment2App.swift in Sources */,
