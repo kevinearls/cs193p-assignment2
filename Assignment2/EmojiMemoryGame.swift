@@ -26,6 +26,7 @@ class EmojiMemoryGame: ObservableObject {
         model.choose(card)
     }
     
+    // FIXME: 
     func startNewGame() {
         model = EmojiMemoryGame.createMemoryGame()
     }
