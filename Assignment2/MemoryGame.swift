@@ -21,19 +21,21 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
     
     // Class examples: Haloween, Flags, Vehicles, Faces Food, Places
     let vehicleEmojis =  ["✈️",  "🚃", "🚅", "🚁", "🚕", "🚗", "🚙", "🚌", "🚎", "🏎", "🚢", "🚓", "🚑", "🚒", "🚐", "🛻", "🚚", "🦽", "🦼", "🛴", "🚲", "🛵", "🏍"]
-    //let fruitEmojis = ["🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈", "🍒", "🍑", "🥭", "🍍", "🥥", "🥝", "🍅", "🍆", "🥑"]
-    //let animalEmojis = ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐻‍❄️", "🐨", "🐯", "🦁", "🐮", "🐷", "🐽", "🐸", "🐵", "🙈", "🙉", "🙊", "🐒", "🐔", "🐧", "🐦"]
-    //let vehicleEmojis =  ["✈️",  "🚃", "🚅", "🚁", "🚕", "🚗", "🚙", "🚌"]
-    let fruitEmojis = ["🍏", "🍎", "🍐", "🍊", "🍋", "🍌"]
-    let animalEmojis = ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊"]
-    
+    let fruitEmojis = ["🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈", "🍒", "🍑", "🥭", "🍍", "🥥", "🥝", "🍅", "🍆", "🥑"]
+    let animalEmojis = ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐻‍❄️", "🐨", "🐯", "🦁", "🐮", "🐷", "🐽", "🐸", "🐵", "🙈", "🙉", "🙊", "🐒", "🐔", "🐧", "🐦"]
     let sportsEmojis = [ "🏈", "⚽️", "🏀", "🏋🏻" ]
     private var chosenTheme: Theme?
     private var themes: [String: Theme] = [:]
     
+    mutating func shuffle() {
+        cards.shuffle()
+    }
+    
     mutating func choose(_ card: Card) {
+        print("Card \(card.id) was chosen")
         if let chosenIndex = cards.firstIndex(where: { $0.id == card.id}), !cards[chosenIndex].isFaceUp, !cards[chosenIndex].isMatched {
             // Two cards are chosen
+            print("Chosen index was \(chosenIndex)")
             if let potentialMatchIndex = indexOfTheOneAndOnlyFaceUpCard {
                 if cards[chosenIndex].content == cards[potentialMatchIndex].content {
                     cards[chosenIndex].isMatched = true
@@ -77,17 +79,18 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
     init() {
         cards = []
         
-        let animals = Theme(name: "animals", color:Color.red, numberOfPairsOfCards: 4, emoji: animalEmojis)
-        let fruits = Theme(name: "fruits", color:Color.blue, numberOfPairsOfCards: 6, emoji: fruitEmojis)
+        let animals = Theme(name: "animals", color:Color.red, numberOfPairsOfCards: 8, emoji: animalEmojis)
+        let fruits = Theme(name: "fruits", color:Color.blue, numberOfPairsOfCards: 8, emoji: fruitEmojis)
         let vehicles = Theme(name: "vehicles", color:Color.green, numberOfPairsOfCards: 8, emoji: vehicleEmojis)
-        let sports = Theme(name: "sports", color:Color.brown, numberOfPairsOfCards: 3, emoji: sportsEmojis)
+        let sports = Theme(name: "sports", color:Color.brown, numberOfPairsOfCards: 4, emoji: sportsEmojis)
         themes[animals.name] = animals
         themes[fruits.name] = fruits
         themes[vehicles.name] = vehicles
         themes[sports.name] = sports
         
         // Pick a theme for this game at random
-        let themeIndex = Int.random(in: 0..<themes.count)
+        //let themeIndex = Int.random(in: 0..<themes.count)
+        let themeIndex = 2 // FIXME remove this
         let themeNames = Array(themes.keys)
         chosenTheme = themes[themeNames[themeIndex]]
         
@@ -99,23 +102,88 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
             cards.append(Card(content: content as! CardContent, id: pairIndex * 2 + 1))
         }
         
-        //cards = cards.shuffled()
+        cards.shuffle()
     }
     
     struct Card: Identifiable {
-        var isFaceUp = false
-        var isMatched = false
-        var hasBeenSeen = false
+        var isFaceUp = false {
+            didSet {
+                if isFaceUp {
+                    startUsingBonusTime()
+                } else {
+                    stopUsingBonusTime()
+                }
+            }
+        }
+        var isMatched = false {
+            didSet {
+                stopUsingBonusTime()
+            }
+        }
+        var hasBeenSeen: Bool = false
         let content: CardContent
         let id: Int
+        
+        // MARK: - Bonus Time
+        
+        // this could give matching bonus points
+        // if the user matches the card
+        // before a certain amount of time passes during which the card is face up
+        
+        // can be zero which means "no bonus available" for this card
+        var bonusTimeLimit: TimeInterval = 6
+        
+        // how long this card has ever been face up
+        private var faceUpTime: TimeInterval {
+            if let lastFaceUpDate = self.lastFaceUpDate {
+                return pastFaceUpTime + Date().timeIntervalSince(lastFaceUpDate)
+            } else {
+                return pastFaceUpTime
+            }
+        }
+
+        // the last time this card was turned face up (and is still face up)
+        var lastFaceUpDate: Date?
+        // the accumulated time this card has been face up in the past
+        // (i.e. not including the current time it's been face up if it is currently so)
+        var pastFaceUpTime: TimeInterval = 0
+        
+        // how much time left before the bonus opportunity runs out
+        var bonusTimeRemaining: TimeInterval {
+            max(0, bonusTimeLimit - faceUpTime)
+        }
+        // percentage of the bonus time remaining
+        var bonusRemaining: Double {
+            (bonusTimeLimit > 0 && bonusTimeRemaining > 0) ? bonusTimeRemaining/bonusTimeLimit : 0
+        }
+        // whether the card was matched during the bonus time period
+        var hasEarnedBonus: Bool {
+            isMatched && bonusTimeRemaining > 0
+        }
+        // whether we are currently face up, unmatched and have not yet used up the bonus window
+        var isConsumingBonusTime: Bool {
+            isFaceUp && !isMatched && bonusTimeRemaining > 0
+        }
+        
+        // called when the card transitions to face up state
+        private mutating func startUsingBonusTime() {
+            if isConsumingBonusTime, lastFaceUpDate == nil {
+                lastFaceUpDate = Date()
+            }
+        }
+        // called when the card goes back face down (or gets matched)
+        private mutating func stopUsingBonusTime() {
+            pastFaceUpTime = faceUpTime
+            self.lastFaceUpDate = nil
+        }
     }
-    
-    private struct Theme {
-        var name: String
-        var color: Color
-        var numberOfPairsOfCards: Int
-        var emoji: [String]
-    }
+}
+
+private struct Theme {
+    var name: String
+    var color: Color
+    var numberOfPairsOfCards: Int
+    var emoji: [String]
 }
 
 extension Array {

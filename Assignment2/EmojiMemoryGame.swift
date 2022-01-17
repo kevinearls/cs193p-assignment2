@@ -31,6 +31,10 @@ class EmojiMemoryGame: ObservableObject {
         model = EmojiMemoryGame.createMemoryGame()
     }
     
+    func restart() {
+        model = EmojiMemoryGame.createMemoryGame()
+    }
+    
     func getTheme() -> String {
         model.getCurrentTheme()
     }
@@ -41,6 +45,10 @@ class EmojiMemoryGame: ObservableObject {
     
     func getScore() -> Int {
         model.getScore()
+    }
+    
+    func shuffle() {
+        model.shuffle()
     }
     
     
