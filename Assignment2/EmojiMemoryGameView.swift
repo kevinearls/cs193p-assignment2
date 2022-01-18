@@ -20,7 +20,7 @@ struct EmojiMemoryGameView: View {
             VStack {
                 gameBody
                 HStack {
-                    restart
+                    restart  // i.e. new game
                     Spacer()
                     shuffle
                 }
@@ -28,8 +28,6 @@ struct EmojiMemoryGameView: View {
             }
             deckBody
             scoreDisplay
-            //shuffleButton
-            //newGameButton
         }
         .padding()
     }
